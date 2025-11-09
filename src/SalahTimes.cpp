@@ -1,26 +1,50 @@
-#include "SalahTimes.h"
+#include "SalahTimes.h" // Enthält die Klassendefinition und die Indizes!
 #include <Arduino.h> 
-#include <PrayerTimes.h> // Hinzugefügt, falls nicht vorhanden
+#include <PrayerTimes.h>
+#include "ConfigManager.h"
+
+// --- Implementierung des Konstruktors ---
 
 SalahTimeCalculator::SalahTimeCalculator() {
     
-    salahEngine = new PrayerTimes(LATITUDE, LONGITUDE, TIMEZONE);
+    // Wichtig: Die Konstanten LATITUDE etc. existieren nicht mehr, wir greifen auf configManager zu
+    salahEngine = new PrayerTimes(
+        configManager.config.latitude, 
+        configManager.config.longitude, 
+        configManager.config.timeZone
+    );
 
-    // 1. ZURÜCK ZUR MWL-METHODE: Diese verwendet den Shafi'i-Asr-Faktor, 
-    // der Deiner gewünschten Kurve (14:36) am nächsten kommt.
-    salahEngine->setCalculationMethod(MWL); 
+    salahEngine = nullptr; // Sicherstellen, dass Pointer null ist
 
-    // 2. KORREKTUREN: Die Abweichungen zwischen MWL-Berechnung und Deiner Referenz (05:31, 12:11, 14:36)
-    // werden als konstante Verschiebung über das Jahr hinweg angewendet.
-    salahEngine->setAdjustments(-07, -14, -11, +1, +5, -9); 
-    
-    // Initialisiere die Zeiten auf Null
     for (int i = 0; i < 6; i++) {
         timesMinutes[i] = 0;
     }
 }
 
+void SalahTimeCalculator::initCalculator() {
+    // 1. Instanziierung mit dynamischen Werten
+    if (salahEngine != nullptr) {
+        delete salahEngine; // Alte Instanz löschen
+    }
+    
+    salahEngine = new PrayerTimes(
+        configManager.config.latitude, 
+        configManager.config.longitude, 
+        configManager.config.timeZone
+    );
+
+    // 2. Berechnungsmethode und Adjustments setzen
+    salahEngine->setCalculationMethod(MWL); 
+    salahEngine->setAdjustments(-7, -14, -11, 1, 5, -9); 
+}
+
+// --- Implementierung von updateTimes ---
+
 void SalahTimeCalculator::updateTimes(const tm& timeinfo) {
+    if (salahEngine == nullptr) {
+        initCalculator(); // Sicherstellen, dass die Berechnung möglich ist
+    }
+
     Serial.println("Updating Salah Times...");
     
     int currentMonth = timeinfo.tm_mon + 1; 
@@ -48,27 +72,30 @@ void SalahTimeCalculator::updateTimes(const tm& timeinfo) {
     ); 
 
     // Konvertierung der Ergebnisse in Minuten seit Mitternacht und Speicherung
-    timesMinutes[FAJR_IDX]    = fajrHour * 60 + fajrMinute;
-    timesMinutes[SUNRISE_IDX] = sunriseHour * 60 + sunriseMinute;
-    timesMinutes[DHUHR_IDX]   = dhuhrHour * 60 + dhuhrMinute;
-    timesMinutes[ASR_IDX]     = asrHour * 60 + asrMinute;
-    timesMinutes[MAGHRIB_IDX] = maghribHour * 60 + maghribMinute;
-    timesMinutes[ISHA_IDX]    = ishaHour * 60 + ishaMinute;
+    // WICHTIG: Die Indizes sind jetzt durch #include "SalahTimes.h" sichtbar!
+    timesMinutes[FAJR_IDX]      = fajrHour * 60 + fajrMinute;
+    timesMinutes[SUNRISE_IDX]   = sunriseHour * 60 + sunriseMinute;
+    timesMinutes[DHUHR_IDX]     = dhuhrHour * 60 + dhuhrMinute;
+    timesMinutes[ASR_IDX]       = asrHour * 60 + asrMinute;
+    timesMinutes[MAGHRIB_IDX]   = maghribHour * 60 + maghribMinute;
+    timesMinutes[ISHA_IDX]      = ishaHour * 60 + ishaMinute;
 
     Serial.println("Salah Times updated.");
     
     // --- NEUE DEBUG-AUSGABE ---
     Serial.println("--- BERECHNETE ZEITEN (MWL/Shafi'i) ---");
-    Serial.print("Fajr: "); Serial.println(convertMinutesToHHMM(timesMinutes[FAJR_IDX]));
-    Serial.print("Sunrise: "); Serial.println(convertMinutesToHHMM(timesMinutes[SUNRISE_IDX]));
-    Serial.print("Dhuhr: "); Serial.println(convertMinutesToHHMM(timesMinutes[DHUHR_IDX]));
-    Serial.print("Asr: "); Serial.println(convertMinutesToHHMM(timesMinutes[ASR_IDX]));
-    Serial.print("Maghrib: "); Serial.println(convertMinutesToHHMM(timesMinutes[MAGHRIB_IDX]));
-    Serial.print("Isha: "); Serial.println(convertMinutesToHHMM(timesMinutes[ISHA_IDX]));
+    // WICHTIG: convertMinutesToHHMM ist static, daher SalahTimeCalculator::
+    Serial.print("Fajr: "); Serial.println(SalahTimeCalculator::convertMinutesToHHMM(timesMinutes[FAJR_IDX]));
+    Serial.print("Sunrise: "); Serial.println(SalahTimeCalculator::convertMinutesToHHMM(timesMinutes[SUNRISE_IDX]));
+    Serial.print("Dhuhr: "); Serial.println(SalahTimeCalculator::convertMinutesToHHMM(timesMinutes[DHUHR_IDX]));
+    Serial.print("Asr: "); Serial.println(SalahTimeCalculator::convertMinutesToHHMM(timesMinutes[ASR_IDX]));
+    Serial.print("Maghrib: "); Serial.println(SalahTimeCalculator::convertMinutesToHHMM(timesMinutes[MAGHRIB_IDX]));
+    Serial.print("Isha: "); Serial.println(SalahTimeCalculator::convertMinutesToHHMM(timesMinutes[ISHA_IDX]));
     Serial.println("---------------------------------------");
 }
 
-// Implementierung von convertMinutesToHHMM bleibt unverändert
+// --- Implementierung von convertMinutesToHHMM ---
+
 int SalahTimeCalculator::convertMinutesToHHMM(int totalMinutes) {
     if (totalMinutes < 0 || totalMinutes >= 1440) return 0;
     int hours = totalMinutes / 60;

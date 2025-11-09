@@ -1,0 +1,25 @@
+<!DOCTYPE HTML>
+<html lang="de">
+<head>
+  <title>Salah Clock Konfiguration</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <div class="container">
+    <h1>🕌 Salah Clock Konfiguration</h1>
+    
+    <h2>Standort & Zeit</h2>
+    <form action="/save" method="post">
+      <p>Breitengrad (LAT): <input type="number" step="any" name="latitude" value="%LAT%"></p>
+      <p>Längengrad (LON): <input type="number" step="any" name="longitude" value="%LON%"></p>
+      <p>Zeitzone (h): <input type="number" step="1" name="timezone" value="%TZ%"></p>
+      <p><input type="submit" value="Speichern & Neustart"></p>
+    </form>
+    
+    <div class="info-box">
+      <p>Nach dem Speichern startet die Uhr neu und berechnet die Zeiten nach der Hanafi-Regel.</p>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,81 @@
+/* style.css (Modernes Dark Mode Design) */
+
+:root {
+  --color-dark-bg: #1e1e1e;
+  --color-primary-bg: #2d2d2d;
+  --color-text-light: #e0e0e0;
+  --color-text-accent: #4CAF50; /* Grüner Akzent */
+  --color-shadow: rgba(0, 0, 0, 0.4);
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: var(--color-dark-bg);
+  color: var(--color-text-light);
+  margin: 0;
+  padding: 0;
+  line-height: 1.6;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 100vh;
+}
+
+.container {
+  max-width: 450px;
+  background-color: var(--color-primary-bg);
+  padding: 30px;
+  margin: 40px auto;
+  border-radius: 12px;
+  box-shadow: 0 8px 16px var(--color-shadow);
+  text-align: center;
+}
+
+h1 {
+  color: var(--color-text-accent);
+  margin-bottom: 25px;
+  font-size: 2em;
+  border-bottom: 2px solid #3a3a3a;
+  padding-bottom: 10px;
+}
+
+h2 {
+  color: var(--color-text-light);
+  text-align: left;
+  margin-top: 25px;
+  margin-bottom: 15px;
+  font-size: 1.3em;
+}
+
+form {
+    text-align: left;
+}
+
+input[type="number"], input[type="submit"] {
+    width: 100%;
+    padding: 12px;
+    margin: 8px 0;
+    box-sizing: border-box;
+    border: 1px solid #3A3A3A;
+    border-radius: 5px;
+    font-size: 16px;
+    background-color: #2D2D2D;
+    color: #E0E0E0;
+    transition: border-color 0.3s;
+}
+
+input[type="submit"] {
+    background-color: var(--color-text-accent);
+    color: white;
+    cursor: pointer;
+    border: none;
+    transition: background-color 0.3s;
+}
+
+.info-box {
+    margin-top: 20px;
+    padding: 10px;
+    background-color: #333333;
+    border-radius: 5px;
+    font-size: 0.9em;
+}
