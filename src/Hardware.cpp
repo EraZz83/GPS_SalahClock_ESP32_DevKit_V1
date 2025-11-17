@@ -28,7 +28,7 @@ void initDisplays() {
  * Aktualisiert das übergebene Display mit der angegebenen Zeit im HHMM-Format
  * und wendet die aktuelle Helligkeit an.
  */
-void refreshDisplayValueBrightness(TM1637Display &display, int timeValue)
+void refreshDisplayValueBrightness(TM1637Display &display, int timeValue, int brightness)
 {
     // Die refreshDisplay-Variable wird in main.cpp verwaltet, daher 
     // muss diese Funktion davon entkoppelt sein oder das Flag übergeben bekommen.

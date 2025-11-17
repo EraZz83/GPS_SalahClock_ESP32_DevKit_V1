@@ -6,18 +6,20 @@
 #include <FS.h>
 #include <LittleFS.h>
 
-struct ClockConfig {
+struct ClockConfig
+{
     float latitude = 47.52777;
     float longitude = 9.37074;
     int timeZone = 1;
 };
 
-class ConfigManager {
+class ConfigManager
+{
 public:
     ConfigManager();
-    void loadConfig(); 
-    void saveConfig(); 
-    void initServer(); 
+    void loadConfig();
+    void saveConfig();
+    void initServer();
     void startWebServer();
 
     ClockConfig config;

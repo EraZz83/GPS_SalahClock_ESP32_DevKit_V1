@@ -2,13 +2,10 @@
 #include <ESPmDNS.h>
 #include <WiFi.h>
 
-void setupNetworkServices(const char* hostname, const char* ntpServer, int gmtOffset, int daylightOffset) {
-    
-    // 1. NTP Initialisierung
-    configTime(gmtOffset, daylightOffset, ntpServer);
-
-    // 2. mDNS Initialisierung
-    if (!MDNS.begin(hostname)) {
+void setupNetworkServices(const char *hostname, const char *ntpServer, int gmtOffset, int daylightOffset)
+{
+    if (!MDNS.begin(hostname))
+    {
         Serial.println("❌ mDNS konnte nicht gestartet werden.");
         return;
     }
