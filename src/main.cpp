@@ -1,21 +1,23 @@
 #include <Arduino.h>
-#include <WiFi.h>
-#include <LittleFS.h>
 #include "ConfigManager.h"
-#include <ArduinoOTA.h>
+#include <OTAHandler.h>
 #include <ESPmDNS.h>
 #include "Hardware.h"
 #include "SalahTimes.h"
-#include <PrayerTimes.h>
 #include "NTPHandler.h"
+#include "LittleFSHandler.h"
+#include <WiFiManager.h>
 
 bool refreshDisplay = true;
-int actTime;
-int oldTimeMin;
-int oldTimeSec;
+int brightness = 7;
 struct tm timeinfo;
 
 SalahTimeCalculator salahCalculator;
+
+const int NUM_DISPLAYS = 6;
+const int CLK_PINS[NUM_DISPLAYS] = {15, 27, 25, 32, 4, 17};
+const int DIO_PINS[NUM_DISPLAYS] = {2, 14, 26, 33, 16, 5};
+TM1637Display *displays[NUM_DISPLAYS];
 
 const char *ap_ssid = "salah_config_AP";
 const char *ap_password = "123Polizei";
@@ -33,42 +35,45 @@ const int brightnessOff = 64;
 const int brightnessOn = 255;
 const char *ntpServer = "pool.ntp.org";
 
+NTPHandler ntpHandler(gmtOffset_sec, daylightOffset_sec, ntpServer);
+
 void setup()
 {
     Serial.begin(115200);
     Serial.println("Booting");
 
-    startLittleFS();
+    // Initialisierung der Displays
+    for (int i = 0; i < NUM_DISPLAYS; i++)
+    {
+        displays[i] = new TM1637Display(CLK_PINS[i], DIO_PINS[i]);
+        initDisplays(*displays[i]); // WICHTIG: Stern (*) zum Dereferenzieren
+    }
+
+    initLittleFS();
 
     configManager.loadConfig();
-
     salahCalculator.initCalculator();
-    initDisplays();
 
-        if (connectWifi())
+    if (connectToWiFi(sta_ssid, sta_password, 5))
     {
-        ntp
+        ntpHandler.initTimeSync();
         configManager.initServer();
         configManager.startWebServer();
-        setupOTA();
+        setupOTA(sta_hostname);
     }
     else
     {
         Serial.println("\n❌ WLAN-Verbindung fehlgeschlagen. Starte Konfigurationsmodus (AP)...");
 
-        // Fallback auf AP
-        WiFi.softAP(ap_ssid, ap_password);
+        startAP(ap_ssid, ap_password, local_IP, gateway, subnet);
         Serial.print("AP gestartet. IP: ");
         Serial.println(WiFi.softAPIP());
 
-        // NTP im AP-Modus initialisieren (weniger wichtig, aber gut für den Zeitstempel)
-        initTimeSync();
         configManager.initServer();
         configManager.startWebServer();
     }
 
-    // 3. Erstberechnung (Erfordert erfolgreiche NTP-Synchronisierung, die nun gewartet wird)
-    if (getLocalTime(&timeinfo))
+    if (ntpHandler.getTime(timeinfo))
     {
         salahCalculator.updateTimes(timeinfo);
     }
@@ -76,12 +81,27 @@ void setup()
     {
         Serial.println("❌ Konnte Zeit für Erstberechnung nicht abrufen. Zeiten bleiben 00:00.");
     }
+
+    for (int i = 0; i < NUM_DISPLAYS; i++)
+    {
+        int minutes = salahCalculator.timesMinutes[i];
+        int timeToShow = SalahTimeCalculator::convertMinutesToHHMM(minutes);
+        refreshDisplayValueBrightness(*displays[i], timeToShow, brightness);
+    }
 }
 
 void loop(void)
 {
     ArduinoOTA.handle();
-    printLocalTime();
+
+    if (ntpHandler.getTime(timeinfo))
+    {
+        if ((timeinfo.tm_hour == 0) && (timeinfo.tm_min == 0) && (timeinfo.tm_sec == 1))
+        {
+            salahCalculator.updateTimes(timeinfo);
+            refreshDisplay = true;
+        }
+    }
 
     if (refreshDisplay)
     {
@@ -89,8 +109,7 @@ void loop(void)
         {
             int minutes = salahCalculator.timesMinutes[i];
             int timeToShow = SalahTimeCalculator::convertMinutesToHHMM(minutes);
-            if refreshDisplayValueBrightness (*displays[i], timeToShow)
-                ;
+            refreshDisplayValueBrightness(*displays[i], timeToShow, brightness);
         }
         refreshDisplay = false;
     }

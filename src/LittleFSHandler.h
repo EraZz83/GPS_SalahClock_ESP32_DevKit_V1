@@ -1,3 +1,5 @@
+#pragma once
+
 #include <LittleFS.h>
 
-bool startLittleFS()
+bool initLittleFS();

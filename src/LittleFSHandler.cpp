@@ -1,6 +1,7 @@
-#include LittleFS.h
+#include <LittleFS.h>
+#include "LittleFSHandler.h"
 
-bool startLittleFS()
+bool initLittleFS()
 {
     if (!LittleFS.begin(true))
     {

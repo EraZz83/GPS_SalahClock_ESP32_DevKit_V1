@@ -1,13 +1,17 @@
 #pragma once
+#include <time.h>
+#include <Arduino.h>
 
 class NTPHandler
 {
 public:
-    bool initTimeSync(int gmtOffset_sec, int daylightOffset_sec, char ntpServer);
-    bool getLocalTime(tm &timeinfo);
+    NTPHandler(int gmtOffset_sec, int daylightOffset_sec, const char *ntpServer);
+
+    bool initTimeSync();
+    bool getTime(tm &timeinfo);
 
 private:
-    int gmtOffset_sec;
-    int daylightOffset_sec;
-    char ntpServer;
+    int _gmtOffset_sec;
+    int _daylightOffset_sec;
+    const char *_ntpServer;
 };

@@ -1,7 +1,7 @@
 #include <WiFi.h>
 #include "WiFiManager.h"
 
-void connectToWiFi(const char *ssid, const char *password, int maxTries)
+bool connectToWiFi(const char *ssid, const char *password, int maxTries)
 {
   Serial.print("🔌 Verbinde mit Netzwerk");
   WiFi.mode(WIFI_STA);
@@ -20,22 +20,26 @@ void connectToWiFi(const char *ssid, const char *password, int maxTries)
     Serial.println("\n✅ STA verbunden!");
     Serial.print("📡 IP: ");
     Serial.println(WiFi.localIP());
+    return true;
   }
   else
   {
     Serial.println("\n❌ Verbindung fehlgeschlagen!");
+    return false;
   }
 }
 
-void startAP(const char *ap_ssid, const char *ap_password, IPAddress ip, IPAddress gateway, IPAddress subnet)
+bool startAP(const char *ap_ssid, const char *ap_password, IPAddress ip, IPAddress gateway, IPAddress subnet)
 {
   if (!WiFi.softAPConfig(ip, gateway, subnet))
   {
     Serial.println("❌ softAPConfig fehlgeschlagen!");
+    return false;
   }
 
   WiFi.softAP(ap_ssid, ap_password);
   Serial.print("\n✅ Access Point gestartet:");
   Serial.print("\n📶 IP: ");
   Serial.println(WiFi.softAPIP());
+    return true;
 }
