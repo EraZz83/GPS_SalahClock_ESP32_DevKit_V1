@@ -1,6 +1,6 @@
 #include "NTPHandler.h"
 
-NTPHandler::NTPHandler(int gmtOffset_sec, int daylightOffset_sec, const char* ntpServer)
+NTPHandler::NTPHandler(int gmtOffset_sec, int daylightOffset_sec, String  ntpServer)
 {
     _gmtOffset_sec = gmtOffset_sec;
     _daylightOffset_sec = daylightOffset_sec;
@@ -11,7 +11,9 @@ bool NTPHandler::initTimeSync()
 {
     Serial.println("Starte NTP-Synchronisierung...");
 
-    configTime(_gmtOffset_sec, _daylightOffset_sec, _ntpServer);
+    const char* ntpServerCStr = _ntpServer.c_str();
+
+    configTime(_gmtOffset_sec, _daylightOffset_sec, ntpServerCStr);
 
     struct tm timeinfo_check;
     int attempts = 0;

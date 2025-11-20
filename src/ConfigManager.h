@@ -11,6 +11,11 @@ struct ClockConfig
     float latitude = 47.52777;
     float longitude = 9.37074;
     int timeZone = 1;
+    String sta_hostname = "salah";
+    String sta_ssid = "TurkishAirlines_";
+    String sta_password = "123Polizei";
+    String ap_ssid = "Salah_Fallback_AP";
+    String ap_password = "123Polizei";
 };
 
 class ConfigManager

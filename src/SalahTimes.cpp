@@ -46,6 +46,7 @@ bool SalahTimeCalculator::checkTimechange(const tm &timeinfo)
     {
         return true;
     }
+    return false;
 }
 
 // --- Implementierung von updateTimes ---

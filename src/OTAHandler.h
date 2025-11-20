@@ -3,5 +3,5 @@
 
 #include <ArduinoOTA.h>
 
-void setupOTA(const char* hostname);
+void setupOTA(String hostname);
 void handleOTA();

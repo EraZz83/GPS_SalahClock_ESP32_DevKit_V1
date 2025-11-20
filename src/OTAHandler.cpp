@@ -1,6 +1,6 @@
 #include "OTAHandler.h"
 
-void setupOTA(const char* hostname) {
+void setupOTA(String hostname) {
   ArduinoOTA
         .onStart([]()
                  {
@@ -32,7 +32,10 @@ void setupOTA(const char* hostname) {
     } else if (error == OTA_END_ERROR) {
       Serial.println("End Failed");
     } });
-    ArduinoOTA.setHostname(hostname);
+
+    const char* hostnameCStr = hostname.c_str();
+
+    ArduinoOTA.setHostname(hostnameCStr);
     ArduinoOTA.begin();
 }
 

@@ -7,7 +7,7 @@
 </head>
 <body>
   <div class="container">
-    <h1>🕌 Salah Clock Konfiguration</h1>
+    <h1>Salah Clock Konfiguration</h1>
     
     <h2>Standort & Zeit</h2>
     <form action="/save" method="post">
@@ -16,6 +16,9 @@
       <p>Zeitzone (h): <input type="number" step="1" name="timezone" value="%TZ%"></p>
       <p>WLAN SSID: <input type="text" step="1" name="sta_ssid" value="%STASSID%"></p>
       <p>WLAN Passwort: <input type="text" step="1" name="sta_password" value="%STAPW%"></p>
+      <p>WLAN Hostname: <input type="text" step="1" name="sta_hostname" value="%STAHOSTNAME%"></p>
+      <p>Fallback AP Passwort: <input type="text" step="1" name="ap_ssid" value="%APSSID%"></p>
+      <p>Fallback AP SSID: <input type="text" step="1" name="ap_password" value="%APPW%"></p>
       <p><input type="submit" value="Speichern & Neustart"></p>
     </form>
     

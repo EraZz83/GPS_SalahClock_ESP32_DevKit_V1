@@ -19,12 +19,6 @@ const int CLK_PINS[NUM_DISPLAYS] = {15, 27, 25, 32, 4, 17};
 const int DIO_PINS[NUM_DISPLAYS] = {2, 14, 26, 33, 16, 5};
 TM1637Display *displays[NUM_DISPLAYS];
 
-const char *ap_ssid = "salah_config_AP";
-const char *ap_password = "123Polizei";
-const char *sta_hostname = "salah";
-const char *sta_ssid = "TurkishAirlines_";
-const char *sta_password = "123Polizei";
-
 IPAddress local_IP(192, 168, 1, 1);
 IPAddress gateway(192, 168, 1, 1);
 IPAddress subnet(255, 255, 255, 0);
@@ -53,18 +47,18 @@ void setup()
     configManager.loadConfig();
     salahCalculator.initCalculator();
 
-    if (connectToWiFi(sta_ssid, sta_password, 5))
+    if (connectToWiFi(configManager.config.sta_ssid, configManager.config.sta_password, 5))
     {
         ntpHandler.initTimeSync();
         configManager.initServer();
         configManager.startWebServer();
-        setupOTA(sta_hostname);
+        setupOTA(configManager.config.sta_hostname);
     }
     else
     {
         Serial.println("\n❌ WLAN-Verbindung fehlgeschlagen. Starte Konfigurationsmodus (AP)...");
 
-        startAP(ap_ssid, ap_password, local_IP, gateway, subnet);
+        startAP(configManager.config.ap_ssid, configManager.config.ap_password, local_IP, gateway, subnet);
         Serial.print("AP gestartet. IP: ");
         Serial.println(WiFi.softAPIP());
 

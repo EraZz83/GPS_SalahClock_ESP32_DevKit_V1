@@ -59,6 +59,11 @@ void ConfigManager::saveConfig()
     doc["lat"] = config.latitude;
     doc["lon"] = config.longitude;
     doc["tz"] = config.timeZone;
+    doc["stassid"] = config.sta_ssid;
+    doc["stapw"] = config.sta_password;
+    doc["stahn"] = config.sta_hostname;
+    doc["apssid"] = config.ap_ssid;
+    doc["appw"] = config.ap_password;
 
     if (serializeJson(doc, configFile) == 0)
     {
@@ -108,6 +113,11 @@ void ConfigManager::startWebServer()
         html.replace("%LAT%", String(config.latitude, 6));
         html.replace("%LON%", String(config.longitude, 6));
         html.replace("%TZ%", String(config.timeZone));
+        html.replace("%STAHOSTNAME%", String(config.sta_hostname));
+        html.replace("%STASSID%", String(config.sta_ssid));
+        html.replace("%STAPW%", String(config.sta_password));
+        html.replace("%APSSID%", String(config.ap_ssid));
+        html.replace("%APPW%", String(config.ap_password));
         
         request->send(200, "text/html", html); });
 
@@ -118,6 +128,11 @@ void ConfigManager::startWebServer()
             config.latitude = request->getParam("latitude", true)->value().toFloat();
             config.longitude = request->getParam("longitude", true)->value().toFloat();
             config.timeZone = request->getParam("timezone", true)->value().toInt();
+            config.sta_hostname = request->getParam("sta_hostname", true)->value();
+            config.sta_ssid = request->getParam("sta_ssid", true)->value();
+            config.sta_password = request->getParam("sta_password", true)->value();
+            config.ap_ssid = request->getParam("ap_ssid", true)->value();
+            config.ap_password = request->getParam("ap_password", true)->value();
             
             saveConfig(); 
             request->send(200, "text/plain", "Konfiguration gespeichert. Starte neu...");
@@ -135,5 +150,5 @@ void ConfigManager::startWebServer()
                        { request->send(404, "text/html", "<h1>Datei nicht gefunden. Versuche salah.local</h1>"); });
 
     server->begin();
-    Serial.println("Webserver gestartet. Gehe zu http://salah.local");
+    Serial.println(String("Webserver gestartet. Gehe zu http://") + config.sta_hostname + ".local");
 }

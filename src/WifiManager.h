@@ -2,5 +2,5 @@
 
 #include <WiFi.h>
 
-bool connectToWiFi(const char *ssid, const char *password, int maxTries);
-bool startAP(const char *ap_ssid, const char *ap_password, IPAddress ip, IPAddress gateway, IPAddress subnet);
+bool connectToWiFi(String ssid, String password, int maxTries);
+bool startAP(String ap_ssid, String ap_password, IPAddress ip, IPAddress gateway, IPAddress subnet);

@@ -5,7 +5,7 @@
 class NTPHandler
 {
 public:
-    NTPHandler(int gmtOffset_sec, int daylightOffset_sec, const char *ntpServer);
+    NTPHandler(int gmtOffset_sec, int daylightOffset_sec, String ntpServer);
 
     bool initTimeSync();
     bool getTime(tm &timeinfo);
@@ -13,5 +13,5 @@ public:
 private:
     int _gmtOffset_sec;
     int _daylightOffset_sec;
-    const char *_ntpServer;
+    String _ntpServer;
 };
