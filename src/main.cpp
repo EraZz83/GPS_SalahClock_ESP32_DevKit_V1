@@ -42,11 +42,10 @@ void setup()
     Serial.begin(115200);
     Serial.println("Booting");
 
-    // Initialisierung der Displays
     for (int i = 0; i < NUM_DISPLAYS; i++)
     {
         displays[i] = new TM1637Display(CLK_PINS[i], DIO_PINS[i]);
-        initDisplays(*displays[i]); // WICHTIG: Stern (*) zum Dereferenzieren
+        initDisplays(*displays[i]);
     }
 
     initLittleFS();
@@ -94,13 +93,10 @@ void loop(void)
 {
     ArduinoOTA.handle();
 
-    if (ntpHandler.getTime(timeinfo))
+    if (salahCalculator.checkTimechange(timeinfo))
     {
-        if ((timeinfo.tm_hour == 0) && (timeinfo.tm_min == 0) && (timeinfo.tm_sec == 1))
-        {
-            salahCalculator.updateTimes(timeinfo);
-            refreshDisplay = true;
-        }
+        salahCalculator.updateTimes(timeinfo);
+        refreshDisplay = true;
     }
 
     if (refreshDisplay)
